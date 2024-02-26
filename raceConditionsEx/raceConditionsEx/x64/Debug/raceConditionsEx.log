@@ -2,7 +2,7 @@
   
   C:\Users\stijn\Documents\school\2023-2024\geavanceerde computerarchitectuur\GCA_lab2\raceConditionsEx\raceConditionsEx>"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.3\bin\nvcc.exe" -gencode=arch=compute_52,code=\"sm_52,compute_52\" --use-local-env -ccbin "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.28.29333\bin\HostX86\x64" -x cu   -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.3\include" -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.3\include"  -G   --keep-dir x64\Debug  -maxrregcount=0   --machine 64 --compile -cudart static  -g  -DWIN32 -DWIN64 -D_DEBUG -D_CONSOLE -D_MBCS -Xcompiler "/EHsc /W3 /nologo /Od /FS /Zi /RTC1 /MDd " -Xcompiler "/Fdx64\Debug\vc142.pdb" -o "C:\Users\stijn\Documents\school\2023-2024\geavanceerde computerarchitectuur\GCA_lab2\raceConditionsEx\raceConditionsEx\x64\Debug\kernel.cu.obj" "C:\Users\stijn\Documents\school\2023-2024\geavanceerde computerarchitectuur\GCA_lab2\raceConditionsEx\raceConditionsEx\kernel.cu" 
   kernel.cu
-  tmpxft_000069d8_00000000-7_kernel.cudafe1.cpp
+  tmpxft_000024bc_00000000-7_kernel.cudafe1.cpp
 C:\Users\stijn\Documents\school\2023-2024\geavanceerde computerarchitectuur\GCA_lab2\raceConditionsEx\raceConditionsEx\kernel.cu(78): warning C4244: 'argument': conversion from '_Rep' to 'int', possible loss of data
           with
           [
@@ -18,7 +18,7 @@ C:\Users\stijn\Documents\school\2023-2024\geavanceerde computerarchitectuur\GCA_
           [
               _Rep=__int64
           ]
-C:\Users\stijn\Documents\school\2023-2024\geavanceerde computerarchitectuur\GCA_lab2\raceConditionsEx\raceConditionsEx\kernel.cu(176): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
+C:\Users\stijn\Documents\school\2023-2024\geavanceerde computerarchitectuur\GCA_lab2\raceConditionsEx\raceConditionsEx\kernel.cu(178): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
      Creating library C:\Users\stijn\Documents\school\2023-2024\geavanceerde computerarchitectuur\GCA_lab2\raceConditionsEx\x64\Debug\raceConditionsEx.lib and object C:\Users\stijn\Documents\school\2023-2024\geavanceerde computerarchitectuur\GCA_lab2\raceConditionsEx\x64\Debug\raceConditionsEx.exp
 LINK : warning LNK4098: defaultlib 'LIBCMT' conflicts with use of other libs; use /NODEFAULTLIB:library
   raceConditionsEx.vcxproj -> C:\Users\stijn\Documents\school\2023-2024\geavanceerde computerarchitectuur\GCA_lab2\raceConditionsEx\x64\Debug\raceConditionsEx.exe
