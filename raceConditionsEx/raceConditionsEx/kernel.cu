@@ -3,8 +3,21 @@
 
 #include <stdio.h>
 #include <time.h>
+#include <string>
+#include <fstream>
+#include <iostream>
 
 #include <chrono>
+
+//writeToCSV
+//help function to write stuff to csv
+void writeRecordToFile(std::string filename, std::string fieldOne, std::string fieldTwo, int fieldThree)
+{
+    std::ofstream file;
+    file.open(filename, std::ios_base::app);
+    file << fieldOne << "," << fieldTwo << "," << fieldThree << std::endl;
+    file.close();
+}
 
 // ---- reduction GPU
 // -------- GPU recution kernel
@@ -48,11 +61,21 @@ int detectMaxGPUReduction(int* A, int N)
     cudaMemcpy(gpuA, A, N * sizeof(int), cudaMemcpyHostToDevice);
     cudaMemcpy(gpuMax, &max, sizeof(int), cudaMemcpyHostToDevice);
 
+    //start chrono
+    auto startTimeGPU = std::chrono::steady_clock::now();
+
     //execute kernel
     int threadsPerBlock = 1024;
     //int blocksPerGrid = (N + threadsPerBlock - 1) / threadsPerBlock;
     int blocksPerGrid = 1;
     getMaxReduction << <blocksPerGrid, threadsPerBlock >> > (gpuA, gpuMax, N);
+
+    //end chrono and calculate the duration
+    cudaDeviceSynchronize();
+    auto durationGPU = std::chrono::steady_clock::now() - startTimeGPU;
+
+    //write duration to csv file
+    writeRecordToFile("output.csv", "GPU reduction", std::to_string(N), durationGPU.count());
 
     //copy result back to host
     cudaMemcpy(&max, gpuMax, sizeof(int), cudaMemcpyDeviceToHost);
@@ -62,7 +85,6 @@ int detectMaxGPUReduction(int* A, int N)
     cudaFree(gpuA);
     cudaFree(gpuMax);
 
-    //max = A[0];
     return max;
 }
 
@@ -92,10 +114,20 @@ int detectMaxGPU(int* A, int N)
     cudaMemcpy(gpuA, A, N * sizeof(int), cudaMemcpyHostToDevice);
     cudaMemcpy(gpuMax, &max, sizeof(int), cudaMemcpyHostToDevice);
 
+    //start chrono
+    auto startTimeGPU = std::chrono::steady_clock::now();
+
     //execute kernel
     int threadsPerBlock = 256;
     int blocksPerGrid = (N + threadsPerBlock - 1) / threadsPerBlock;
     getMax << <blocksPerGrid, threadsPerBlock >> > (gpuA, gpuMax);
+
+    //end chrono and calculate the duration
+    cudaDeviceSynchronize();
+    auto durationGPU = std::chrono::steady_clock::now() - startTimeGPU;
+
+    //write duration to csv file
+    writeRecordToFile("output.csv", "GPU atomic", std::to_string(N), durationGPU.count());
 
     //copy result back to host
     cudaMemcpy(&max, gpuMax, sizeof(int), cudaMemcpyDeviceToHost);
@@ -111,6 +143,9 @@ int detectMaxGPU(int* A, int N)
 // -------- CPU function
 int detectMaxCPU(int* A, int size)
 {
+    // Timing for CPU execution
+    auto start = std::chrono::steady_clock::now();
+
     //cpu algorithm
     int max = INT_MIN;
     for (int i = 0; i < size; i++)
@@ -120,6 +155,13 @@ int detectMaxCPU(int* A, int size)
             max = A[i];
         }
     }
+
+    //end chrono and calculate the duration
+    auto duration = std::chrono::steady_clock::now() - start;
+
+    //write duration to csv file
+    writeRecordToFile("output.csv", "CPU", std::to_string(size), duration.count());
+
     return max;
 }
 
@@ -127,31 +169,35 @@ int detectMaxCPU(int* A, int size)
 int main()
 {
     const int base = 2;
-    for (int i = 0; i < 11; i++)
+    for (int j = 0; j < 1000; j++)
     {
-        //create a random array of integers
-        //allocate memory
-        int N = (int)base * pow(2, i); //mount of elements
-        size_t size = N * sizeof(int); //amount of bytes
-        int* A = (int*)malloc(size); //memory alocation
+        for (int i = 0; i < 11; i++)
+        {
+            //create a random array of integers
+            //allocate memory
+            int N = (int)base * pow(2, i); //mount of elements
+            size_t size = N * sizeof(int); //amount of bytes
+            int* A = (int*)malloc(size); //memory alocation
 
-        //fill up the memory with a random array
-        for (int i = 0; i < N; ++i) {
-            A[i] = rand();
+            //fill up the memory with a random array
+            for (int i = 0; i < N; ++i) {
+                A[i] = rand();
+            }
+
+            //three executions types
+            // ---- CPU
+            printf("maximum of %d numbers CPU: %d\n\n", N, detectMaxCPU(A, N));
+
+
+            // ---- GPU
+            printf("maximum of %d numbers GPU: %d\n\n", N, detectMaxGPU(A, N));
+
+            //execute on GPU using reduction
+            printf("maximum of %d numbers GPU: %d\n\n - - - - \n", N, detectMaxGPUReduction(A, N));
+
+            //free up memory
+            free(A);
         }
-
-        //three executions types
-        //execute on cpu
-        printf("maximum of %d numbers CPU: %d\n\n", N, detectMaxCPU(A, N));
-
-        //execute on GPU
-        printf("maximum of %d numbers GPU: %d\n\n", N, detectMaxGPU(A, N));
-
-        //execute on GPU using reduction
-        printf("maximum of %d numbers GPU: %d\n\n - - - - \n", N, detectMaxGPUReduction(A, N));
-
-        //free up memory
-        free(A);
     }
     return 0;
 }
